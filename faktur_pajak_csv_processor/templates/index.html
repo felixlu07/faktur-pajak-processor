@@ -1,101 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Processor</title>
+    <title>FR8Labs - Prosesor Faktur Pajak</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Inter', sans-serif;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f5f7fa;
+            color: #1a1a1a;
         }
         .container {
             background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 20px;
         }
-        h1 {
-            color: #333;
+        .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .header h1 {
+            color: #2563eb;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #64748b;
+            font-size: 1.1em;
+            line-height: 1.6;
         }
         .upload-form {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .file-input-container {
+            width: 100%;
+            max-width: 600px;
         }
         .file-input {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            width: 100%;
+            border: 2px dashed #cbd5e1;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
         }
         .file-input:hover {
-            border-color: #666;
+            border-color: #2563eb;
+            background-color: #f0f7ff;
         }
         .submit-btn {
-            background-color: #4CAF50;
+            background-color: #2563eb;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 30px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
         }
         .submit-btn:hover {
-            background-color: #45a049;
+            background-color: #1d4ed8;
         }
         .instructions {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
         }
         .instructions h2 {
-            color: #333;
-            margin-bottom: 10px;
+            color: #0f172a;
+            margin-bottom: 15px;
+            font-size: 1.3em;
         }
         .instructions ul {
             margin: 0;
             padding-left: 20px;
+            color: #475569;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .notice {
+            margin-top: 30px;
+            padding: 15px 20px;
+            background-color: #fff7ed;
+            border: 1px solid #ffedd5;
+            border-radius: 8px;
+            color: #9a3412;
+            font-size: 0.95em;
+            line-height: 1.5;
         }
         #loading {
             display: none;
             text-align: center;
             margin-top: 20px;
+            color: #2563eb;
+        }
+        .fr8labs-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>CSV Processor</h1>
+        <div class="header">
+            <h1>Prosesor Faktur Pajak FR8Labs</h1>
+            <p>Solusi otomatis untuk memformat file CSV Faktur Pajak sesuai dengan standar regulasi Indonesia</p>
+        </div>
+        
         <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
-            <div class="file-input">
-                <input type="file" name="file" accept=".csv" required>
+            <div class="file-input-container">
+                <div class="file-input">
+                    <input type="file" name="file" accept=".csv" required>
+                </div>
             </div>
-            <button type="submit" class="submit-btn">Process CSV</button>
+            <button type="submit" class="submit-btn">Proses File CSV</button>
         </form>
+        
         <div id="loading">
-            Processing... Please wait...
+            <p>Sedang memproses file Anda... Mohon tunggu sebentar...</p>
+        </div>
+        
+        <div class="notice">
+            <strong>Catatan Penting:</strong> Untuk mengoptimalkan penggunaan sumber daya, sistem akan memasuki mode istirahat setelah 15 menit tidak aktif. 
+            Hal ini dapat menyebabkan keterlambatan respons hingga 50 detik saat mengakses kembali. Mohon bersabar saat menunggu sistem kembali aktif.
         </div>
         
         <div class="instructions">
-            <h2>Processing Details:</h2>
+            <h2>Proses Pengolahan File:</h2>
             <ul>
-                <li>Adds double quotes around all fields</li>
-                <li>Changes date format to DD/MM/YYYY</li>
-                <li>Removes dots from faktur numbers</li>
-                <li>Adds "0" for empty numeric fields</li>
-                <li>Uses empty quoted strings ("") for empty text fields</li>
-                <li>Rounds down JUMLAH_DPP and JUMLAH_PPN values for FK rows</li>
+                <li>Menambahkan tanda kutip ganda pada semua kolom</li>
+                <li>Mengubah format tanggal menjadi DD/MM/YYYY</li>
+                <li>Menghapus titik dari nomor faktur</li>
+                <li>Mengisi kolom numerik kosong dengan "0"</li>
+                <li>Menggunakan tanda kutip kosong ("") untuk kolom teks yang kosong</li>
+                <li>Membulatkan ke bawah nilai JUMLAH_DPP dan JUMLAH_PPN untuk baris FK</li>
             </ul>
+        </div>
+
+        <div class="fr8labs-footer">
+            <p> 2024 FR8Labs Indonesia - Solusi Digital untuk Logistik Indonesia</p>
         </div>
     </div>
 
