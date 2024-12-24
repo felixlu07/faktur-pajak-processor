@@ -6,7 +6,31 @@ import math
 
 app = Flask(__name__)
 
+# Expected header for the CSV file
+EXPECTED_HEADER = ["FK", "KD_JENIS_TRANSAKSI", "FG_PENGGANTI", "NOMOR_FAKTUR", "MASA_PAJAK", 
+                  "TAHUN_PAJAK", "TANGGAL_FAKTUR", "NPWP", "NAMA", "ALAMAT_LENGKAP", 
+                  "JUMLAH_DPP", "JUMLAH_PPN", "JUMLAH_PPNBM", "ID_KETERANGAN_TAMBAHAN"]
+
 def process_csv(df):
+    # Ensure the CSV starts with the expected header
+    header_found = False
+    for idx, row in df.iterrows():
+        if list(row) == EXPECTED_HEADER:
+            if idx > 0:
+                # Remove all rows before the header
+                df = df.iloc[idx:].reset_index(drop=True)
+            header_found = True
+            break
+    
+    if not header_found:
+        # If header not found, create a new DataFrame with the correct header
+        new_df = pd.DataFrame(columns=EXPECTED_HEADER)
+        if not df.empty:
+            # Append the old data if it exists
+            df.columns = EXPECTED_HEADER
+            new_df = pd.concat([new_df, df], ignore_index=True)
+        df = new_df
+
     # Add double quotes around all fields (pandas will handle this during to_csv)
     
     # Process only rows where first column is "FK"
