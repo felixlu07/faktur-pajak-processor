@@ -15,7 +15,9 @@ def process_csv(df):
     # Ensure the CSV starts with the expected header
     header_found = False
     for idx, row in df.iterrows():
-        if list(row) == EXPECTED_HEADER:
+        # Check if the row starts with all expected headers
+        current_row = list(row)[:len(EXPECTED_HEADER)]
+        if current_row == EXPECTED_HEADER:
             if idx > 0:
                 # Remove all rows before the header
                 df = df.iloc[idx:].reset_index(drop=True)
@@ -23,11 +25,19 @@ def process_csv(df):
             break
     
     if not header_found:
-        # If header not found, create a new DataFrame with the correct header
-        new_df = pd.DataFrame(columns=EXPECTED_HEADER)
+        # If header not found, preserve all columns but ensure required columns are present
+        all_columns = list(df.columns)
+        new_columns = EXPECTED_HEADER.copy()
+        
+        # Add any additional columns that might exist in the original data
+        for col in all_columns:
+            if col not in new_columns:
+                new_columns.append(col)
+        
+        new_df = pd.DataFrame(columns=new_columns)
         if not df.empty:
             # Append the old data if it exists
-            df.columns = EXPECTED_HEADER
+            df.columns = new_columns
             new_df = pd.concat([new_df, df], ignore_index=True)
         df = new_df
 
